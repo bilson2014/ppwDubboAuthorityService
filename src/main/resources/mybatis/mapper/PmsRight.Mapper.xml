@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paipianwang.pat.facade.right.service.dao.impl.PmsRightDaoImpl">
+
+	<!-- 产品信息表 -->
+	<sql id="pms_rights"> RIGHTS </sql>
+	
+	
+	<select id="findMaxPos" resultType="long">
+		SELECT MAX(r.POS)
+			FROM <include refid="pms_rights" /> r 
+	</select>
+</mapper>
