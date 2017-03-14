@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.paipianwang.pat.facade.right.entity.PmsRole;
-import com.paipianwang.pat.facade.right.service.PmsRightFacade;
 import com.paipianwang.pat.facade.right.service.PmsRoleFacade;
-import com.paipianwang.pat.facade.right.service.biz.PmsRightBiz;
 import com.paipianwang.pat.facade.right.service.biz.PmsRoleBiz;
 /**
  * 权限服务接口实现

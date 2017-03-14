@@ -4,7 +4,6 @@ package com.paipianwang.pat.facade.right.service.dao;
 import java.util.List;
 
 import com.paipianwang.pat.common.core.dao.BaseDao;
-import com.paipianwang.pat.facade.right.entity.PmsRight;
 import com.paipianwang.pat.facade.right.entity.PmsRole;
 
 /**

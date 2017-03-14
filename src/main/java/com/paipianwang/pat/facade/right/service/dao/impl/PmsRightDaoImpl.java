@@ -4,6 +4,7 @@ package com.paipianwang.pat.facade.right.service.dao.impl;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import com.paipianwang.pat.common.core.dao.impl.BaseDaoImpl;
 import com.paipianwang.pat.facade.right.entity.PmsRight;
 import com.paipianwang.pat.facade.right.service.dao.PmsRightDao;
