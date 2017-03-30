@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paipianwang.pat.facade.right.service.dao.impl.PmsEmployeeDaoImpl">
+
+	<!-- 人员表 -->
+	<sql id="pms_employee"> EMPLOYEE </sql>
+	<sql id="pms_employee_role"> EMPLOYEE_ROLE </sql>
+	<sql id="pms_role"> ROLE </sql>
+	
+	<select id="doLogin" resultType="PmsEmployee">
+		SELECT e.EMPLOYEEID,
+			   e.EMPLOYEELOGINNAME,
+			   e.EMPLOYEEREALNAME,
+			   e.EMPLOYEEPASSWORD,
+			   e.EMPLOYEEDESCRIPTION,
+			   e.EMPLOYEEIMG,
+			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS updateDate
+		FROM 
+		<include refid="pms_employee" /> e 
+	   <where>
+	   	   e.EMPLOYEELOGINNAME = #{loginName}
+		   AND e.EMPLOYEEPASSWORD = #{password}
+		   AND DIMISSIONSTATUS != 1
+	   </where>
+	</select>
+	
+	<select id="checkPhoneNumber" resultType="java.lang.Long">
+		SELECT COUNT(1)
+			FROM 
+			<include refid="pms_employee" />
+		<where>
+			PHONENUMBER = #{phoneNumber}
+		</where>
+	</select>
+	
+	<select id="getEmployeesWithVersionManager" resultType="PmsEmployee">
+		SELECT DISTINCT
+			   e.EMPLOYEEID AS employeeId,
+			   e.EMPLOYEEREALNAME AS employeeRealName
+		FROM 
+		<include refid="pms_employee" /> e 
+		LEFT JOIN 
+		<include refid="pms_employee_role" /> inl
+			on inl.employeeId = e.employeeId
+		LEFT JOIN 
+		<include refid="pms_role" /> r
+			on r.roleId = inl.roleId
+		<where>
+			e.PHONENUMBER = #{phoneNumber} 
+			AND e.FLAG =  1
+			AND r.roleName like '视频管家%'
+		</where>
+	</select>
+	
+	<update id="editPasswordById">
+		UPDATE 
+		<include refid="pms_employee" />
+		<set>
+			EMPLOYEEPASSWORD = #{employeePassword},
+			UPDATEDATE = CURRENT_TIMESTAMP
+		</set>
+		<where>
+			EMPLOYEEID = #{employeeId}
+		</where>
+	</update>
+	
+	<select id="findEmployeeToSynergy" resultType="PmsEmployee">
+		SELECT DISTINCT
+			   e.EMPLOYEEID AS employeeId,
+			   e.EMPLOYEEREALNAME AS employeeRealName
+		FROM 
+		<include refid="pms_employee" /> e 
+		LEFT JOIN 
+		<include refid="pms_employee_role" /> inl
+			on inl.employeeId = e.employeeId
+		LEFT JOIN 
+		<include refid="pms_role" /> r
+			on r.roleId = inl.roleId
+		<where>
+			e.FLAG =  1
+			AND r.roleName like '视频管家%'
+			AND DIMISSIONSTATUS != 1
+		</where>
+	</select>
+	
+	<select id="listPage" resultType="PmsEmployee">
+		SELECT e.EMPLOYEEID AS employeeId,
+			   e.EMPLOYEELOGINNAME AS employeeLoginName,
+			   e.EMPLOYEEREALNAME AS employeeRealName,
+			   e.EMPLOYEEDESCRIPTION AS employeeDescription,
+			   e.EMPLOYEEIMG AS employeeImg,
+			   e.EMAIL AS email,
+			   e.PHONENUMBER AS phoneNumber,
+			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS updateDate,
+			   e.DIMISSIONSTATUS AS dimissionStatus
+		FROM 
+		<include refid="pms_employee" /> e 
+		<where>
+			e.FLAG = 1
+			<if test="employeeRealName != null and employeeRealName != ''">
+				AND e.EMPLOYEEREALNAME LIKE
+				CONCAT(CONCAT('%',#{employeeRealName}),'%')
+			</if>
+		</where>
+		ORDER BY e.EMPLOYEEID DESC
+		LIMIT ${begin} , ${limit}
+	</select>
+	
+	<select id="listPageCount" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM 
+		<include refid="pms_employee" /> e 
+		<where>
+			<if test="employeeRealName != null and employeeRealName != ''">
+				e.EMPLOYEEREALNAME LIKE
+				CONCAT(CONCAT('%',#{employeeRealName}),'%')
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="employeeId"
+		parameterType="PmsEmployee">
+		INSERT INTO 
+		<include refid="pms_employee" /> 
+		(	   EMPLOYEELOGINNAME,
+			   EMPLOYEEREALNAME,
+			   EMPLOYEEPASSWORD,
+			   EMPLOYEEDESCRIPTION,
+			   EMAIL,
+			   PHONENUMBER,
+			   DIMISSIONSTATUS
+			   )
+		VALUES (
+			#{employeeLoginName},
+			#{employeeRealName},
+			#{employeePassword},
+			#{employeeDescription},
+			#{email},
+			#{phoneNumber},
+			${dimissionStatus}
+			)
+	</insert>
+	
+	<insert id="saveRelativity">
+		<if test="roleIds != null">
+				INSERT INTO <include refid="pms_employee_role" /> 
+					(  EMPLOYEEID,
+					   ROLEID)
+				VALUES 
+			<foreach collection="roleIds" item="roleId" separator=",">
+				<if test="roleId != 0">
+					(${employeeId},${roleId})
+				</if>
+			</foreach>
+		</if>
+	</insert>
+	
+	<update id="updateImagePath">
+		UPDATE 
+		<include refid="pms_employee" /> 
+		<set>
+			EMPLOYEEIMG = #{employeeImg}
+		</set> 
+		<where>
+			EMPLOYEEID = #{employeeId}
+		</where>
+	</update>
+	
+	<select id="findEmployerById" resultType="PmsEmployee">
+		SELECT e.EMPLOYEEID AS employeeId,
+			   e.EMPLOYEELOGINNAME AS employeeLoginName,
+			   e.EMPLOYEEREALNAME AS employeeRealName,
+			   e.EMPLOYEEPASSWORD AS employeePassword,
+			   e.EMPLOYEEDESCRIPTION AS employeeDescription,
+			   e.EMPLOYEEIMG AS employeeImg,
+			   e.EMAIL AS email,
+			   e.PHONENUMBER AS phoneNumber,
+			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS uploadDate
+		FROM 
+		<include refid="pms_employee" /> e 
+		<where>
+			e.EMPLOYEEID = #{employeeId}
+		</where>
+	</select>
+	
+	<delete id="deleteEmployeeRoleLink">
+		DELETE FROM 
+		<include refid="pms_employee_role" />
+		<where>
+			EMPLOYEEID = #{employeeId}
+		</where>
+	</delete>
+	
+	<update id="update">
+		UPDATE 
+		<include refid="pms_employee" />
+		<set>
+			EMPLOYEELOGINNAME = #{employeeLoginName},
+			EMPLOYEEREALNAME = #{employeeRealName},
+			<if test="employeePassword != null and employeePassword != ''">
+				EMPLOYEEPASSWORD = #{employeePassword},
+			</if>
+			EMPLOYEEDESCRIPTION = #{employeeDescription},
+			PHONENUMBER = #{phoneNumber},
+			EMAIL = #{email},
+			DIMISSIONSTATUS = ${dimissionStatus},
+			UPDATEDATE = CURRENT_TIMESTAMP
+		</set>
+		<where>
+			EMPLOYEEID = #{employeeId}
+		</where>
+	</update>
+	
+</mapper>

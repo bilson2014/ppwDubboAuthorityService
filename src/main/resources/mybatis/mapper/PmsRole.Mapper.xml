@@ -7,6 +7,16 @@
 	<sql id="pms_role_right"> ROLE_RIGHT </sql>
 	<sql id="pms_rights"> RIGHTS </sql>
 	
+	<sql id="condition_sql">
+		<!-- Equal query -->
+		<if test="roleName != null and roleName !=''"> AND r.ROLENAME LIKE CONCAT(CONCAT('%',#{roleName}),'%') </if>
+		<if test="pList != null and pList !=''"> and RIGHTID IN 
+			<foreach collection="pList" open="(" close=")" item="pId" separator=",">
+				${pId}
+			</foreach>
+		</if>
+	</sql>
+	
 	<resultMap type="PmsRole" id="RoleMap">
 		<id property="roleId" column="roleId" />
 		<result property="roleName" column="roleName" />
@@ -27,7 +37,70 @@
 		</collection>
 	</resultMap>
 
-	<select id="getRolesByEmployId" resultType="PmsRole">
+	<insert id="insert" useGeneratedKeys="true" keyProperty="roleId" parameterType="PmsRole">
+		INSERT INTO 
+			<include refid="pms_role" /> 
+		(
+			ROLENAME,
+			ROLEDESCRIPTION
+		)
+		VALUES (
+			#{roleName},
+			#{roleDescription}
+		)
+	</insert>
+	
+	<insert id="grantRoleRightLink">
+		INSERT INTO 
+			<include refid="pms_role_right" />
+		(
+			ROLEID,
+			RIGHTID
+		)
+			VALUES
+		<foreach collection="rightIds" item="rightId"
+				separator=",">
+				(${roleId},${rightId})
+		</foreach>
+	</insert>
+	
+	<update id="update">
+		UPDATE <include refid="pms_role" />
+			<set>
+				ROLENAME = #{roleName},
+				ROLEDESCRIPTION = #{roleDescription},
+				UPDATEDATE = CURRENT_TIMESTAMP
+			</set>
+		<where>
+			ROLEID = ${roleId}
+		</where>
+	</update>
+	
+	<delete id="deleteById">
+		DELETE FROM 
+			<include refid="pms_role" /> 
+		<where>
+			ROLEID = #{roleId}
+		</where>
+	</delete>
+	
+	<delete id="deleteRoleRightLink">
+		DELETE FROM 
+			<include refid="pms_role_right" />
+		<where>
+			ROLEID = #{roleId}
+		</where>
+	</delete>
+	
+	<delete id="deleteEmployeeRoleLink">
+		DELETE FROM 
+			<include refid="pms_employee_role" />
+		<where>
+			ROLEID = #{roleId}
+		</where>
+	</delete>
+	
+	<select id="findRolesByEmployId" resultType="PmsRole">
 		SELECT r.ROLEID roleId,
 		   r.ROLENAME roleName,
 		   r.ROLEDESCRIPTION roleDescription
@@ -40,7 +113,8 @@
 			er.employeeId = #{employeeId}
 		</where>
 	</select>
-	<select id="findRoleById" resultMap="RoleRightMap">
+	
+	<select id="getById" resultMap="RoleRightMap">
 			SELECT r.ROLEID,
 				   r.ROLENAME,
 				   r.ROLEDESCRIPTION,
@@ -63,4 +137,49 @@
 				r.ROLEID = #{roleId}
 			</where>
 	</select>
+	
+	<select id="listBy" resultType="PmsRole">
+		SELECT r.ROLEID,
+			   r.ROLENAME,
+			   r.ROLEVALUE,
+			   r.ROLEDESCRIPTION
+			FROM <include refid="pms_role" /> r 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+	<select id="listPageCount" resultType="Long">
+		SELECT COUNT(1)
+			FROM <include refid="pms_role" /> r 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+	<select id="listWithPagination" resultMap="RoleRightMap">
+		SELECT r.ROLEID,
+			   r.ROLENAME,
+			   r.ROLEDESCRIPTION,
+			   r.ROLEVALUE,
+			   DATE_FORMAT(r.UPDATEDATE,'%Y-%m-%d') AS updateDate,
+			   ri.RIGHTID,
+			   ri.RIGHTNAME,
+			   ri.URL,
+			   ri.POS,
+			   ri.CODE
+			FROM <include refid="pms_role" /> r 
+		    LEFT JOIN <include refid="pms_role_right" /> link
+		   		ON r.ROLEID = link.ROLEID
+		    LEFT JOIN <include refid="pms_rights" /> ri
+		   		ON ri.RIGHTID = link.RIGHTID
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<![CDATA[
+			ORDER BY r.ROLEID ASC
+			LIMIT ${begin} , ${limit}
+		]]>
+	</select>
+	
 </mapper>

@@ -2,12 +2,168 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paipianwang.pat.facade.right.service.dao.impl.PmsRightDaoImpl">
 
-	<!-- 产品信息表 -->
+	<!-- 权限表 -->
 	<sql id="pms_rights"> RIGHTS </sql>
+	<sql id="pms_role_rights"> ROLE_RIGHT </sql>
 	
+	<!-- 条件设置 -->
+	<sql id="condition_sql">
+		<!-- Equal query -->
+		<if test="resourceType != null"> and RESOURCETYPE = ${resourceType} </if>
+		<if test="pList != null and pList !=''"> and RIGHTID IN 
+			<foreach collection="pList" open="(" close=")" item="pId" separator=",">
+				${pId}
+			</foreach>
+		</if>
+	</sql>
 	
-	<select id="findMaxPos" resultType="long">
+	<insert id="insert" useGeneratedKeys="true" keyProperty="rightId" parameterType="PmsRight">
+		INSERT INTO 
+			<include refid="pms_rights" />
+		(
+			RIGHTNAME,
+			URL,
+			RIGHTDESCRIPTION,
+			ICON,
+   			PID,
+   			SEQ,
+   			status,
+   			RESOURCETYPE,
+   			POS,
+   			CODE,
+   			ISCOMMON)
+   		VALUES (
+   			#{rightName},
+			#{url},
+			#{rightDescription},
+			#{icon},
+			${pId},
+			${seq},
+			${status},
+			${resourceType},
+			${pos},
+			${code},
+			${isCommon}
+   		)
+	</insert>
+	
+	<update id="update">
+		UPDATE <include refid="pms_rights" />
+		<set>
+			RIGHTNAME = #{rightName},
+			URL = #{url},
+			RIGHTDESCRIPTION = #{rightDescription},
+			ICON = #{icon},
+			PID = #{pId},
+			SEQ = ${seq},
+			status = ${status},
+			RESOURCETYPE = ${resourceType},
+			ISCOMMON = ${isCommon},
+			UPDATEDATE = CURRENT_TIMESTAMP
+		</set>
+		<where>
+			RIGHTID = ${rightId}
+		</where>
+	</update>
+	
+	<delete id="deleteByIds">
+		DELETE FROM RIGHTS
+			WHERE RIGHTID IN 
+			<foreach collection="ids" open="(" close=")" item="rightId" separator=",">
+				${rightId}
+			</foreach>
+	</delete>
+	
+	<select id="findMaxPos" resultType="Integer">
 		SELECT MAX(r.POS)
 			FROM <include refid="pms_rights" /> r 
+	</select>
+	
+	<select id="findMaxCodeByPos" resultType="Long">
+		SELECT MAX(r.CODE)
+			FROM <include refid="pms_rights" /> r
+		<where>
+			r.POS = #{maxPos}
+		</where>
+	</select>
+	
+	<select id="listPageCount" resultType="Long">
+		SELECT COUNT(1)
+			FROM <include refid="pms_rights" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+	<select id="listPage" resultType="PmsRight">
+		SELECT r.RIGHTID,
+			   r.RIGHTNAME,
+			   r.URL,
+			   r.RIGHTDESCRIPTION,
+			   r.ICON,
+			   r.PID,
+			   r.SEQ,
+			   r.status,
+			   r.RESOURCETYPE,
+			   r.POS,
+			   r.CODE,
+			   r.ISCOMMON,
+			   DATE_FORMAT(r.UPDATEDATE,'%Y-%m-%d') AS updateDate
+		FROM <include refid="pms_rights" /> r
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<![CDATA[
+			ORDER BY r.seq
+			LIMIT ${begin} , ${limit}
+		]]>
+	</select>
+	
+	<select id="listBy" resultType="PmsRight">
+		SELECT r.RIGHTID,
+			   r.RIGHTNAME,
+			   r.URL,
+			   r.RIGHTDESCRIPTION,
+			   r.ICON,
+			   r.PID,
+			   r.SEQ,
+			   r.status,
+			   r.RESOURCETYPE,
+			   r.POS,
+			   r.CODE,
+			   r.ISCOMMON,
+			   DATE_FORMAT(r.UPDATEDATE,'%Y-%m-%d') AS updateDate
+			FROM <include refid="pms_rights" /> r
+			<where>
+				<include refid="condition_sql" />
+			</where>
+	</select>
+	
+	<select id="getById" resultType="PmsRight" >
+		SELECT r.RIGHTID,
+			   r.RIGHTNAME,
+			   r.URL,
+			   r.RIGHTDESCRIPTION,
+			   r.ICON,
+			   r.PID,
+			   r.SEQ,
+			   r.status,
+			   r.RESOURCETYPE,
+			   r.POS,
+			   r.CODE,
+			   r.ISCOMMON,
+			   DATE_FORMAT(r.UPDATEDATE,'%Y-%m-%d') AS updateDate
+		FROM <include refid="pms_rights" /> r
+		<where>
+			r.RIGHTID = #{rightId}
+		</where>
+	</select>
+	
+	<select id="findRightsByRole" resultType="Long">
+		SELECT RIGHTID
+				FROM <include refid="pms_role_rights" />
+		<where>
+			ROLEID = #{roleId}
+		</where>
 	</select>
 </mapper>

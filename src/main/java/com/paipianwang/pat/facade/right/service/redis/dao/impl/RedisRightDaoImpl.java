@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.paipianwang.pat.common.util.GlobalConstant;
+import com.paipianwang.pat.common.constant.PmsConstant;
 import com.paipianwang.pat.common.util.JsonUtil;
 import com.paipianwang.pat.common.util.ValidateUtil;
 import com.paipianwang.pat.facade.right.entity.PmsRight;
@@ -27,7 +27,7 @@ public class RedisRightDaoImpl implements RedisRightDao {
 		Jedis jedis = null;
 		try {
 			jedis = pool.getResource();
-			String str = jedis.hget(GlobalConstant.CONTEXT_RIGHT_MAP, uri);
+			String str = jedis.hget(PmsConstant.CONTEXT_RIGHT_MAP, uri);
 			final PmsRight right = JsonUtil.toBean(str, PmsRight.class);
 			return right;
 		} catch (Exception e) {
@@ -46,7 +46,7 @@ public class RedisRightDaoImpl implements RedisRightDao {
 		Jedis jedis = null;
 		try {
 			jedis = pool.getResource();
-			Map<String,String> map = jedis.hgetAll(GlobalConstant.CONTEXT_RIGHT_MAP);
+			Map<String,String> map = jedis.hgetAll(PmsConstant.CONTEXT_RIGHT_MAP);
 			if(ValidateUtil.isValid(map)){
 				final Map<String,PmsRight> rightMap = RedisUtils.fromJson(map);
 				return rightMap;
@@ -74,7 +74,7 @@ public class RedisRightDaoImpl implements RedisRightDao {
 				final String str = RedisUtils.toJson(right);
 				if(ValidateUtil.isValid(str)){
 					Transaction t = jedis.multi();
-					t.hset(GlobalConstant.CONTEXT_RIGHT_MAP, right.getUrl(), str);
+					t.hset(PmsConstant.CONTEXT_RIGHT_MAP, right.getUrl(), str);
 					t.exec();
 				}
 			} catch (Exception e) {
@@ -96,7 +96,7 @@ public class RedisRightDaoImpl implements RedisRightDao {
 				jedis = pool.getResource();
 				Transaction tx = jedis.multi();
 				final Map<String,String> rightMap = RedisUtils.toJson(map);
-				tx.hmset(GlobalConstant.CONTEXT_RIGHT_MAP, rightMap);
+				tx.hmset(PmsConstant.CONTEXT_RIGHT_MAP, rightMap);
 				tx.exec();
 			} catch (Exception e) {
 				// do something for logger
