@@ -16,13 +16,12 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Transaction;
 
-
 @Repository("RedisRightDao")
 public class RedisRightDaoImpl implements RedisRightDao {
 
 	@Autowired
 	private final JedisPool pool = null;
-	
+
 	public PmsRight getRightFromRedis(final String uri) {
 		Jedis jedis = null;
 		try {
@@ -33,12 +32,12 @@ public class RedisRightDaoImpl implements RedisRightDao {
 		} catch (Exception e) {
 			// do something for logger
 		} finally {
-			if(jedis != null){
+			if (jedis != null) {
 				jedis.disconnect();
 				jedis.close();
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -46,33 +45,33 @@ public class RedisRightDaoImpl implements RedisRightDao {
 		Jedis jedis = null;
 		try {
 			jedis = pool.getResource();
-			Map<String,String> map = jedis.hgetAll(PmsConstant.CONTEXT_RIGHT_MAP);
-			if(ValidateUtil.isValid(map)){
-				final Map<String,PmsRight> rightMap = RedisUtils.fromJson(map);
+			Map<String, String> map = jedis.hgetAll(PmsConstant.CONTEXT_RIGHT_MAP);
+			if (ValidateUtil.isValid(map)) {
+				final Map<String, PmsRight> rightMap = RedisUtils.fromJson(map);
 				return rightMap;
 			}
-			
+
 			return null;
 		} catch (Exception e) {
-			// do something for logger
+			e.printStackTrace();
 		} finally {
-			if(jedis != null){
+			if (jedis != null) {
 				jedis.disconnect();
 				jedis.close();
 			}
 		}
-		
+
 		return null;
 	}
 
 	public void addRightByRedis(final PmsRight right) {
-		
-		if(right != null){
+
+		if (right != null) {
 			Jedis jedis = null;
 			try {
 				jedis = pool.getResource();
 				final String str = RedisUtils.toJson(right);
-				if(ValidateUtil.isValid(str)){
+				if (ValidateUtil.isValid(str)) {
 					Transaction t = jedis.multi();
 					t.hset(PmsConstant.CONTEXT_RIGHT_MAP, right.getUrl(), str);
 					t.exec();
@@ -80,7 +79,7 @@ public class RedisRightDaoImpl implements RedisRightDao {
 			} catch (Exception e) {
 				// do something for logger
 			} finally {
-				if(jedis != null){
+				if (jedis != null) {
 					jedis.disconnect();
 					jedis.close();
 				}
@@ -89,24 +88,24 @@ public class RedisRightDaoImpl implements RedisRightDao {
 	}
 
 	public void resetRightFromRedis(final Map<String, PmsRight> map) {
-		
-		if(ValidateUtil.isValid(map)){
+
+		if (ValidateUtil.isValid(map)) {
 			Jedis jedis = null;
 			try {
 				jedis = pool.getResource();
 				Transaction tx = jedis.multi();
-				final Map<String,String> rightMap = RedisUtils.toJson(map);
+				final Map<String, String> rightMap = RedisUtils.toJson(map);
 				tx.hmset(PmsConstant.CONTEXT_RIGHT_MAP, rightMap);
 				tx.exec();
 			} catch (Exception e) {
 				// do something for logger
 			} finally {
-				if(jedis != null){
+				if (jedis != null) {
 					jedis.disconnect();
 					jedis.close();
 				}
 			}
-			
+
 		}
 	}
 

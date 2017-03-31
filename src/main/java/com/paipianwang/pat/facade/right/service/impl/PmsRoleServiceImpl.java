@@ -13,6 +13,7 @@ import com.paipianwang.pat.common.util.ValidateUtil;
 import com.paipianwang.pat.facade.right.entity.PmsRole;
 import com.paipianwang.pat.facade.right.service.PmsRoleFacade;
 import com.paipianwang.pat.facade.right.service.biz.PmsRoleBiz;
+
 /**
  * 权限服务接口实现
  */
@@ -60,7 +61,7 @@ public class PmsRoleServiceImpl implements PmsRoleFacade {
 
 	@Override
 	public long deleteByIds(long[] ids) {
-		if(ValidateUtil.isValid(ids)) {
+		if (ValidateUtil.isValid(ids)) {
 			final long ret = biz.deleteByIds(ids);
 			return ret;
 		}
@@ -69,7 +70,7 @@ public class PmsRoleServiceImpl implements PmsRoleFacade {
 
 	@Override
 	public long grant(Long roleId, long[] rightIds) {
-		if(roleId != null && ValidateUtil.isValid(rightIds)){
+		if (roleId != null && ValidateUtil.isValid(rightIds)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("roleId", roleId);
 			param.put("rightIds", rightIds);

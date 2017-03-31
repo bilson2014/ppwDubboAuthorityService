@@ -10,7 +10,7 @@
 	<sql id="condition_sql">
 		<!-- Equal query -->
 		<if test="roleName != null and roleName !=''"> AND r.ROLENAME LIKE CONCAT(CONCAT('%',#{roleName}),'%') </if>
-		<if test="pList != null and pList !=''"> and RIGHTID IN 
+		<if test="pList != null and pList !=''"> AND RIGHTID IN 
 			<foreach collection="pList" open="(" close=")" item="pId" separator=",">
 				${pId}
 			</foreach>
@@ -157,7 +157,7 @@
 		</where>
 	</select>
 	
-	<select id="listWithPagination" resultMap="RoleRightMap">
+	<select id="listPage" resultMap="RoleRightMap">
 		SELECT r.ROLEID,
 			   r.ROLENAME,
 			   r.ROLEDESCRIPTION,
@@ -178,7 +178,6 @@
 		</where>
 		<![CDATA[
 			ORDER BY r.ROLEID ASC
-			LIMIT ${begin} , ${limit}
 		]]>
 	</select>
 	

@@ -40,7 +40,7 @@ public class RightTest {
 		right.setIsCommon(true);
 		right.setRightName("权限测试");
 		right.setUrl("/portal/right/save");
-		biz.save(right);
+		// biz.save(right);
 	}
 	
 	@Test
@@ -57,7 +57,7 @@ public class RightTest {
 	
 	@Test
 	public void testAll() {
-		final List<PmsRight> list = biz.all();
+		final List<PmsRight> list = biz.findAllRights();
 		for (PmsRight right : list) {
 			System.err.println(right.getRightName());
 		}
@@ -65,21 +65,21 @@ public class RightTest {
 	
 	@Test
 	public void testGetBy() {
-		final PmsRight right = biz.findRightById(433);
+		final PmsRight right = biz.findRightById(437);
 		System.err.println(right.getRightName());
 	}
 	
 	@Test
 	public void testUpdate() {
-		final PmsRight right = biz.findRightById(433);
+		final PmsRight right = biz.findRightById(437);
 		right.setRightName("测试修改信息");
-		final long ret = biz.update(right);
-		System.err.println(ret);
+		// final long ret = biz.update(right);
+		//System.err.println(ret);
 	}
 	
 	@Test
 	public void testDelete() {
-		final long[] ids = {433,434,435};
+		final long[] ids = {437};
 		biz.deleteByIds(ids);
 	}
 	

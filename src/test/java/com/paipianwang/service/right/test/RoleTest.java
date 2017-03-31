@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.paipianwang.pat.common.entity.DataGrid;
+import com.paipianwang.pat.common.entity.PageParam;
 import com.paipianwang.pat.facade.right.entity.PmsRole;
 import com.paipianwang.pat.facade.right.service.biz.PmsRoleBiz;
 
@@ -76,6 +78,20 @@ public class RoleTest {
 		long[] rightIds = {19};
 		final long ret = biz.deleteByIds(rightIds);
 		System.err.println(ret);
+	}
+	
+	@Test
+	public void testFind() {
+		PageParam pageParam = new PageParam();
+		final long page = 1;
+		final long rows = 20;
+		pageParam.setBegin((page - 1) * rows);
+		pageParam.setLimit(rows);
+		DataGrid<PmsRole> dataGrid = biz.listWithPagination(pageParam, null);
+		List<PmsRole> list = dataGrid.getRows();
+		for (final PmsRole pmsRole : list) {
+			System.err.println(pmsRole.getRoleName());
+		}
 	}
 }
 */

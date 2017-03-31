@@ -32,11 +32,13 @@
 	<typeAliases>
 		<typeAlias alias="PmsRight" type="com.paipianwang.pat.facade.right.entity.PmsRight" />
 		<typeAlias alias="PmsRole" type="com.paipianwang.pat.facade.right.entity.PmsRole" />
+		<typeAlias alias="PmsEmployee" type="com.paipianwang.pat.facade.right.entity.PmsEmployee" />
 	</typeAliases>
 
 	<mappers>
 		<mapper resource="mybatis/mapper/PmsRight.Mapper.xml" />
 		<mapper resource="mybatis/mapper/PmsRole.Mapper.xml" />
+		<mapper resource="mybatis/mapper/PmsEmployee.Mapper.xml" />
 	</mappers>
 
 </configuration>

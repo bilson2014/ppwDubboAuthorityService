@@ -1,6 +1,5 @@
 package com.paipianwang.pat.facade.right.service.dao.impl;
 
-
 import java.util.List;
 
 import org.mybatis.spring.SqlSessionTemplate;
@@ -19,7 +18,7 @@ public class PmsRightDaoImpl extends BaseDaoImpl<PmsRight> implements PmsRightDa
 
 	@Autowired
 	private SqlSessionTemplate sessionTemplate = null;
-	
+
 	public static final String SQL_FIND_MAX_POS = "findMaxPos";
 	public static final String SQL_FIND_MAX_CODE_BY_POS = "findMaxCodeByPos";
 	public static final String SQL_FIND_RIGHTS_BY_ROLE = "findRightsByRole";
@@ -31,14 +30,12 @@ public class PmsRightDaoImpl extends BaseDaoImpl<PmsRight> implements PmsRightDa
 
 	@Override
 	public Long findMaxCodeByPos(Integer maxPos) {
-		return sessionTemplate.selectOne(getStatement(SQL_FIND_MAX_CODE_BY_POS),maxPos);
+		return sessionTemplate.selectOne(getStatement(SQL_FIND_MAX_CODE_BY_POS), maxPos);
 	}
 
 	@Override
 	public List<Long> findRightsByRole(long roleId) {
 		return sessionTemplate.selectList(getStatement(SQL_FIND_RIGHTS_BY_ROLE), roleId);
 	}
-	
 
-	
 }

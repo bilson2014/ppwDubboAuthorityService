@@ -44,8 +44,8 @@ public class PmsRightServiceImpl implements PmsRightFacade {
 	}
 
 	@Override
-	public List<PmsRight> all() {
-		final List<PmsRight> list = biz.all();
+	public List<PmsRight> findAllRights() {
+		final List<PmsRight> list = biz.findAllRights();
 		return list;
 	}
 
@@ -81,7 +81,7 @@ public class PmsRightServiceImpl implements PmsRightFacade {
 
 	@Override
 	public List<PmsTree> resourceTree() {
-		final List<PmsRight> rights = biz.all();
+		final List<PmsRight> rights = biz.findAllRights();
 		final List<PmsTree> trees = new ArrayList<PmsTree>();
 
 		for (final PmsRight right : rights) {
@@ -100,7 +100,7 @@ public class PmsRightServiceImpl implements PmsRightFacade {
 
 	@Override
 	public Map<String, PmsRight> getRightsMergeMap() {
-		List<PmsRight> list = biz.all();
+		List<PmsRight> list = biz.findAllRights();
 		Map<String, PmsRight> map = new HashMap<String, PmsRight>();
 		for (PmsRight pmsRight : list) {
 			final String url = pmsRight.getUrl();
@@ -222,6 +222,11 @@ public class PmsRightServiceImpl implements PmsRightFacade {
 	public List<Long> findRightsByRole(long roleId) {
 		final List<Long> list = biz.findRightsByRole(roleId);
 		return list;
+	}
+
+	@Override
+	public void resetRightOnRedis(Map<String, PmsRight> map) {
+		redisRightDao.resetRightFromRedis(map);
 	}
 
 }
