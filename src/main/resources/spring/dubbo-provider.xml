@@ -21,4 +21,4 @@
 	<dubbo:service interface="com.paipianwang.pat.facade.right.service.PmsRightFacade" ref="pmsRightFacade"/>
 	<!-- 角色服务接口 -->
 	<dubbo:service interface="com.paipianwang.pat.facade.right.service.PmsRoleFacade" ref="pmsRoleFacade"/>
-</beans>  
+</beans>

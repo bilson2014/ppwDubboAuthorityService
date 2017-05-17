@@ -31,4 +31,10 @@ public interface PmsRightDao extends BaseDao<PmsRight>{
 	 */
 	public List<Long> findRightsByRole(long roleId);
 
+	/**
+	 * 根据权限ID删除权限角色关系表数据
+	 * @param rightId
+	 */
+	public long deleteRightRoleLink(long rightId);
+
 }

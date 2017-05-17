@@ -25,7 +25,7 @@ public class PmsRightBiz {
 	 */
 	@Autowired
 	private final PmsRightDao pmsRightDao = null;
-
+	
 	/**
 	 * Redis right dao
 	 */
@@ -81,12 +81,27 @@ public class PmsRightBiz {
 		return ret;
 	}
 
+	/**
+	 * 删除权限
+	 * @param ids
+	 * @return
+	 */
+	@Transactional
 	public long deleteByIds(long[] ids) {
 		if (ValidateUtil.isValid(ids)) {
-			final long ret = pmsRightDao.deleteByIds(ids);
-			return ret;
+			for (final long id : ids) {
+				try {
+					// 删除权限角色关系
+					pmsRightDao.deleteRightRoleLink(id);
+					// 删除权限
+					pmsRightDao.deleteById(id);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return 0l;
+				}
+			}
 		}
-		return 0;
+		return 1l;
 	}
 
 	public List<PmsRight> findRightByPid(Set<Long> pList) {

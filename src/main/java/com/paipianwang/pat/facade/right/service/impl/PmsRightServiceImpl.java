@@ -70,12 +70,20 @@ public class PmsRightServiceImpl implements PmsRightFacade {
 	@Override
 	public long update(PmsRight right) {
 		final long ret = biz.update(right);
+		if(ret > 0) {
+			this.addRightByRedis(right);
+		}
 		return ret;
 	}
 
 	@Override
 	public long deleteByIds(long[] ids) {
 		final long ret = biz.deleteByIds(ids);
+		if(ret > 0) {
+			// 更新权限
+			final Map<String, PmsRight> map = this.getRightsMergeMap();
+			this.resetRightOnRedis(map);
+		}
 		return ret;
 	}
 
@@ -229,4 +237,7 @@ public class PmsRightServiceImpl implements PmsRightFacade {
 		redisRightDao.resetRightFromRedis(map);
 	}
 
+	public void addRightByRedis(PmsRight right) {
+		redisRightDao.addRightByRedis(right);
+	}
 }

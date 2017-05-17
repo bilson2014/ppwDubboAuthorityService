@@ -68,10 +68,26 @@
 	
 	<delete id="deleteByIds">
 		DELETE FROM RIGHTS
-			WHERE RIGHTID IN 
+		<where>
+			RIGHTID IN 
 			<foreach collection="ids" open="(" close=")" item="rightId" separator=",">
 				${rightId}
 			</foreach>
+		</where>
+	</delete>
+	
+	<delete id="deleteById">
+		DELETE FROM RIGHTS
+		<where>
+			RIGHTID = #{rightId}
+		</where>
+	</delete>
+	
+	<delete id="deleteRightRoleLink">
+		DELETE FROM ROLE_RIGHT
+		<where>
+			RIGHTID = #{rightId}
+		</where>
 	</delete>
 	
 	<select id="findMaxPos" resultType="Integer">

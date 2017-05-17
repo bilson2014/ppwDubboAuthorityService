@@ -22,6 +22,7 @@ public class PmsRightDaoImpl extends BaseDaoImpl<PmsRight> implements PmsRightDa
 	public static final String SQL_FIND_MAX_POS = "findMaxPos";
 	public static final String SQL_FIND_MAX_CODE_BY_POS = "findMaxCodeByPos";
 	public static final String SQL_FIND_RIGHTS_BY_ROLE = "findRightsByRole";
+	public static final String SQL_DELETE_RIGHT_ROLE_LINK = "deleteRightRoleLink";
 
 	@Override
 	public Integer findMaxPos() {
@@ -36,6 +37,11 @@ public class PmsRightDaoImpl extends BaseDaoImpl<PmsRight> implements PmsRightDa
 	@Override
 	public List<Long> findRightsByRole(long roleId) {
 		return sessionTemplate.selectList(getStatement(SQL_FIND_RIGHTS_BY_ROLE), roleId);
+	}
+
+	@Override
+	public long deleteRightRoleLink(long rightId) {
+		return sessionTemplate.delete(getStatement(SQL_DELETE_RIGHT_ROLE_LINK), rightId);
 	}
 
 }
