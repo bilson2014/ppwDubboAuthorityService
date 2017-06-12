@@ -12,7 +12,6 @@ import com.paipianwang.pat.common.entity.DataGrid;
 import com.paipianwang.pat.common.entity.PageParam;
 import com.paipianwang.pat.common.util.ValidateUtil;
 import com.paipianwang.pat.facade.right.entity.PmsEmployee;
-import com.paipianwang.pat.facade.right.entity.PmsRole;
 import com.paipianwang.pat.facade.right.service.PmsEmployeeFacade;
 import com.paipianwang.pat.facade.right.service.biz.PmsEmployeeBiz;
 
@@ -57,16 +56,6 @@ public class PmsEmployeeServiceImpl implements PmsEmployeeFacade {
 	@Override
 	public DataGrid<PmsEmployee> listWithPagination(Map<String, Object> paramMap, PageParam pageParam) {
 		final DataGrid<PmsEmployee> dataGrid = pmsEmployeeBiz.listWithPagination(paramMap, pageParam);
-		final List<PmsEmployee> lists = dataGrid.getRows();
-		for (final PmsEmployee employee : lists) {
-			final List<PmsRole> roles = employee.getRoles();
-			final List<Long> roleIds = new ArrayList<Long>();
-			for (final PmsRole role : roles) {
-				final long roleId = role.getRoleId();
-				roleIds.add(roleId);
-			}
-			employee.setRoleIds(roleIds);
-		}
 		return dataGrid;
 	}
 
@@ -174,6 +163,24 @@ public class PmsEmployeeServiceImpl implements PmsEmployeeFacade {
 	@Override
 	public long updateUniqueId(PmsEmployee employee) {
 		return pmsEmployeeBiz.updateUniqueId(employee);
+	}
+
+	@Override
+	public List<PmsEmployee> findEmployeeByRoleName(List<String> roleNameList) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("roleNames", roleNameList);
+		// 非测试类账号
+		param.put("flag", 1l);
+		return pmsEmployeeBiz.findEmployeeByRoleName(param);
+	}
+
+	@Override
+	public List<PmsEmployee> findEmployeeByRoleId(List<Long> roleIdList) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("roleIds", roleIdList);
+		// 非测试类账号
+		param.put("flag", 1l);
+		return pmsEmployeeBiz.findEmployeeByRoleIds(param);
 	}
 
 }

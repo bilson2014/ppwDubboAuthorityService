@@ -1,5 +1,6 @@
 package com.paipianwang.pat.facade.right.service.biz;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,9 @@ public class PmsRoleBiz {
 	
 	@Autowired
 	private final PmsRoleDao pmsRoleDao = null;
+	
+	// 必须存在的角色ID数组
+	private static Long[] REQUIRE_ROLE_ID_ARRAY = {1l,2l,3l,4l,8l,9l,19l};
 	
 	public List<PmsRole> findRolesByEmployId(long employeeId) {
 		return pmsRoleDao.findRolesByEmployId(employeeId);
@@ -45,9 +49,12 @@ public class PmsRoleBiz {
 	public long deleteByIds(long[] ids) {
 		try {
 			for (long roleId : ids) {
-				pmsRoleDao.deleteRoleRightLink(roleId);
-				pmsRoleDao.deleteEmployeeRoleLink(roleId);
-				pmsRoleDao.deleteById(roleId);
+				// 判断角色是否能被删除
+				if(!Arrays.asList(REQUIRE_ROLE_ID_ARRAY).contains(Long.parseLong(roleId + ""))) {
+					pmsRoleDao.deleteRoleRightLink(roleId);
+					pmsRoleDao.deleteEmployeeRoleLink(roleId);
+					pmsRoleDao.deleteById(roleId);
+				}
 			}
 			return 1l;
 		} catch (Exception e) {

@@ -1,8 +1,11 @@
 package com.paipianwang.pat.facade.right.service.biz;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,13 +15,23 @@ import com.paipianwang.pat.common.entity.DataGrid;
 import com.paipianwang.pat.common.entity.PageParam;
 import com.paipianwang.pat.common.util.ValidateUtil;
 import com.paipianwang.pat.facade.right.entity.PmsEmployee;
+import com.paipianwang.pat.facade.right.entity.PmsEmployeeRoleLink;
+import com.paipianwang.pat.facade.right.entity.PmsRole;
 import com.paipianwang.pat.facade.right.service.dao.PmsEmployeeDao;
+import com.paipianwang.pat.facade.right.service.dao.PmsEmployeeRoleLinkDao;
+import com.paipianwang.pat.facade.right.service.dao.PmsRoleDao;
 
 @Service
 public class PmsEmployeeBiz {
 
 	@Autowired
 	private PmsEmployeeDao pmsEmployeeDao = null;
+
+	@Autowired
+	private PmsRoleDao pmsRoleDao = null;
+	
+	@Autowired
+	private PmsEmployeeRoleLinkDao pmsEmployeeRoleLinkDao = null;
 
 	public PmsEmployee doLogin(String loginName, String password) {
 		Map<String, Object> paramMap = new HashMap<>();
@@ -32,8 +45,35 @@ public class PmsEmployeeBiz {
 		return ret;
 	}
 
+	@Transactional
 	public DataGrid<PmsEmployee> listWithPagination(Map<String, Object> paramMap, PageParam pageParam) {
-		return pmsEmployeeDao.listWithPagination(pageParam, paramMap);
+		DataGrid<PmsEmployee> dataGrid = new DataGrid<PmsEmployee>();
+		Long roleId = (Long) paramMap.get("roleId");
+		if (roleId != null && roleId != 0l) {
+			// 查询角色
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("roleId", roleId);
+			List<PmsEmployeeRoleLink> linkList = pmsEmployeeRoleLinkDao.listBy(param);
+			if(ValidateUtil.isValid(linkList)) {
+				// 不为空时，查询员工
+				Set<Long> employeeIds = new HashSet<Long>();
+				for (PmsEmployeeRoleLink link : linkList) {
+					employeeIds.add(link.getEmployeeId());
+				}
+				
+				paramMap.put("employeeIds", employeeIds);
+				dataGrid = pmsEmployeeDao.listWithPagination(pageParam, paramMap);
+				List<PmsEmployee> list = dataGrid.getRows();
+				list = mergeRoleByEmployee(list);
+			}
+		} else {
+			// 不查询角色
+			dataGrid = pmsEmployeeDao.listWithPagination(pageParam, paramMap);
+			List<PmsEmployee> list = dataGrid.getRows();
+			list = mergeRoleByEmployee(list);
+		}
+
+		return dataGrid;
 	}
 
 	@Transactional
@@ -158,5 +198,76 @@ public class PmsEmployeeBiz {
 	public long updateUniqueId(PmsEmployee employee) {
 		return pmsEmployeeDao.updateUniqueId(employee);
 	};
+	
+	/**
+	 * 根据员工列表组装角色信息
+	 * @param list
+	 * @return
+	 */
+	public List<PmsEmployee> mergeRoleByEmployee(List<PmsEmployee> list) {
+		if (list != null && !list.isEmpty()) {
+			for (final PmsEmployee pmsEmployee : list) {
+				final List<Long> ids = new ArrayList<Long>();
+				List<PmsRole> roleList = pmsRoleDao.findRolesByEmployId(pmsEmployee.getEmployeeId());
+				if (!roleList.isEmpty()) {
+					StringBuffer roleNameGroup = new StringBuffer();
+					int count = 0;
+					for (final PmsRole pmsRole : roleList) {
+						long rId = pmsRole.getRoleId();
+						ids.add(rId);
+						roleNameGroup.append(pmsRole.getRoleName());
+						if (count < roleList.size() - 1) {
+							roleNameGroup.append(",");
+						}
+						count++;
+					}
+					pmsEmployee.setRoleIds(ids);
+					pmsEmployee.setRoleNameGroup(roleNameGroup.toString());
+				}
+			}
+		}
+		
+		return list;
+	}
+
+	/**
+	 * 根据角色名字获取员工列表
+	 */
+	public List<PmsEmployee> findEmployeeByRoleName(Map<String, Object> param) {
+		List<PmsEmployeeRoleLink> linkList = pmsEmployeeRoleLinkDao.findEmployeeIdsByRoleName(param);
+		if(ValidateUtil.isValid(linkList)) {
+			Set<Long> employeeIds = new HashSet<Long>();
+			for (final PmsEmployeeRoleLink link : linkList) {
+				employeeIds.add(link.getEmployeeId());
+			}
+			
+			// 根据员工ID获取员工
+			param.put("employeeIds", employeeIds);
+			List<PmsEmployee> list = pmsEmployeeDao.findEmployeeByIds(param);
+			return list;
+		}
+		 return null;
+	}
+
+	/**
+	 * 根据角色ID，查找员工
+	 * @param param
+	 * @return
+	 */
+	public List<PmsEmployee> findEmployeeByRoleIds(Map<String, Object> param) {
+		List<PmsEmployeeRoleLink> linkList = pmsEmployeeRoleLinkDao.listBy(param);
+		if(ValidateUtil.isValid(linkList)) {
+			Set<Long> employeeIds = new HashSet<Long>();
+			for (final PmsEmployeeRoleLink link : linkList) {
+				employeeIds.add(link.getEmployeeId());
+			}
+			
+			// 根据员工ID获取员工
+			param.put("employeeIds", employeeIds);
+			List<PmsEmployee> list = pmsEmployeeDao.findEmployeeByIds(param);
+			return list;
+		}
+		return null;
+	}
 
 }

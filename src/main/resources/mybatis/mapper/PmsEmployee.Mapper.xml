@@ -22,6 +22,26 @@
 				${employeeId}
 			</foreach>
 		</if>
+		
+		<if test="dimissionStatus != null and dimissionStatus != -1">
+			AND DIMISSIONSTATUS = ${dimissionStatus} 
+		</if>
+		
+		<if test="hireBeginDate != null and hireBeginDate != '' ">
+			<![CDATA[
+				AND DATE_FORMAT(HIREDATE,'%Y-%m-%d') >= #{hireBeginDate}
+			]]>
+		</if>
+		
+		<if test="hireEndDate != null  and hireEndDate != ''">
+			<![CDATA[
+				AND DATE_FORMAT(HIREDATE,'%Y-%m-%d') <= #{hireEndDate}
+			]]>
+		</if>
+		
+		<if test="flag != null and flag != -1">
+			AND FLAG = ${flag}
+		</if>
 	</sql>
 	
 	<resultMap type="PmsEmployee" id="EmployeeMap">
@@ -33,6 +53,7 @@
 		<result property="employeeDescription" column="employeeDescription" />
 		<result property="createDate" column="createDate" />
 		<result property="updateDate" column="updateDate" />
+		<result property="hireDate" column="hireDate" />
 		<result property="email" column="email" />
 		<result property="phoneNumber" column="phoneNumber" />
 		<result property="flag" column="flag" />
@@ -125,24 +146,18 @@
 		</where>
 	</update>
 	
-	<select id="listPage" resultMap="EmployeeRoleMap">
+	<select id="listPage" resultType="PmsEmployee">
 		SELECT e.EMPLOYEEID AS employeeId,
-				   e.EMPLOYEELOGINNAME AS employeeLoginName,
-				   e.EMPLOYEEREALNAME AS employeeRealName,
-				   e.EMPLOYEEDESCRIPTION AS employeeDescription,
-				   e.EMPLOYEEIMG AS employeeImg,
-				   e.EMAIL AS email,
-				   e.PHONENUMBER AS phoneNumber,
-				   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS updateDate,
-				   r.ROLEID,
-				   r.ROLENAME,
-				   r.ROLEDESCRIPTION,
-				   e.DIMISSIONSTATUS AS dimissionStatus
+			   e.EMPLOYEELOGINNAME AS employeeLoginName,
+			   e.EMPLOYEEREALNAME AS employeeRealName,
+			   e.EMPLOYEEDESCRIPTION AS employeeDescription,
+			   e.EMPLOYEEIMG AS employeeImg,
+			   e.EMAIL AS email,
+			   e.PHONENUMBER AS phoneNumber,
+			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS updateDate,
+			   DATE_FORMAT(e.HIREDATE,'%Y-%m-%d') AS hireDate,
+			   e.DIMISSIONSTATUS AS dimissionStatus
 			FROM  <include refid="pms_employee" /> e 
-		   LEFT JOIN <include refid="pms_employee_role" /> er
-		   		ON e.EMPLOYEEID = er.EMPLOYEEID
-		   LEFT JOIN <include refid="pms_role" /> r
-		   		ON er.ROLEID = r.ROLEID
 		<where>
 			e.FLAG = 1
 			<include refid="condition" />
@@ -155,8 +170,7 @@
 	
 	<select id="listPageCount" resultType="java.lang.Long">
 		SELECT COUNT(1)
-		FROM 
-		<include refid="pms_employee" /> e 
+		FROM  <include refid="pms_employee" /> e 
 		<where>
 			e.FLAG = 1
 			<include refid="condition" />
@@ -172,7 +186,8 @@
 		   EMPLOYEEDESCRIPTION,
 		   EMAIL,
 		   PHONENUMBER,
-		   DIMISSIONSTATUS
+		   DIMISSIONSTATUS,
+		   HIREDATE
 		)
 		VALUES (
 			#{employeeLoginName},
@@ -181,7 +196,8 @@
 			#{employeeDescription},
 			#{email},
 			#{phoneNumber},
-			${dimissionStatus}
+			${dimissionStatus},
+			#{hireDate}
 			)
 	</insert>
 	
@@ -220,6 +236,7 @@
 			   e.EMAIL AS email,
 			   e.PHONENUMBER AS phoneNumber,
 			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS uploadDate,
+			   DATE_FORMAT(e.HIREDATE,'%Y-%m-%d') AS hireDate,
 			   r.ROLEID,
 			   r.ROLENAME,
 			   r.ROLEDESCRIPTION
@@ -262,7 +279,8 @@
 			PHONENUMBER = #{phoneNumber},
 			EMAIL = #{email},
 			DIMISSIONSTATUS = ${dimissionStatus},
-			UPDATEDATE = CURRENT_TIMESTAMP
+			UPDATEDATE = CURRENT_TIMESTAMP,
+			HIREDATE = #{hireDate} 
 		</set>
 		<where>
 			EMPLOYEEID = ${employeeId}
@@ -287,7 +305,7 @@
 			<where>
 				<![CDATA[
 					e.FLAG = 1
-					AND r.roleName like '视频管家%'
+					AND r.roleName = '销售'
 					AND DIMISSIONSTATUS <> 1
 				]]>
 				<include refid="condition" />
@@ -398,6 +416,20 @@
 		<where>
 			<include refid="condition" />
 		</where>
+	</select>
+	
+	<select id="listBy" resultType="PmsEmployee">
+		SELECT e.EMPLOYEEID AS employeeId,
+			   e.EMPLOYEELOGINNAME AS employeeLoginName,
+			   e.EMPLOYEEREALNAME AS employeeRealName
+		FROM <include refid="pms_employee" /> e 
+		<where>
+			<include refid="condition" />
+		</where>
+		
+		<![CDATA[
+			ORDER BY e.EMPLOYEEID DESC
+		]]>
 	</select>
 	
 </mapper>

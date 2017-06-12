@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paipianwang.pat.facade.right.service.dao.impl.PmsEmployeeRoleLinkDaoImpl">
+
+	<sql id="pms_employee_role"> EMPLOYEE_ROLE </sql>
+	<sql id="pms_role"> ROLE </sql>
+	
+	<sql id="condition_sql">
+		<!-- Equal query -->
+		<if test="employeeId != null and employeeId != 0"> 
+			AND er.EMPLOYEEID = ${employeeId}
+		</if>
+		
+		<if test="roleId != null and roleId != 0"> 
+			AND er.ROLEID = ${roleId}
+		</if>
+		
+		<if test="roleNames != null">
+			AND r.ROLENAME IN 
+			<foreach collection="roleNames" open="(" close=")" item="roleName" separator=",">
+				'#{roleName}'
+			</foreach>
+		</if>
+		
+		<if test="roleIds != null">
+			AND er.ROLEID IN 
+			<foreach collection="roleIds" open="(" close=")" item="roleId" separator=",">
+				${roleId}
+			</foreach>
+		</if>
+	</sql>
+	
+	<select id="listBy" resultType="pmsEmployeeRoleLink">
+		SELECT er.employeeID AS employeeId ,
+			   er.ROLEID AS roleId
+			FROM <include refid="pms_employee_role" /> er 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+	<select id="findEmployeeIdsByRoleName" resultType="PmsEmployeeRoleLink">
+		SELECT er.employeeID AS employeeId ,
+			   er.ROLEID AS roleId
+			FROM <include refid="pms_role" /> r
+			LEFT JOIN <include refid="pms_employee_role" /> er ON r.ROLEID = er.ROLEID
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+</mapper>
