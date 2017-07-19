@@ -270,4 +270,8 @@ public class PmsEmployeeBiz {
 		return null;
 	}
 
+	public List<PmsEmployee> findEmployeeByCondition(Map<String, Object> paramMap) {
+		return pmsEmployeeDao.listBy(paramMap);
+	}
+
 }

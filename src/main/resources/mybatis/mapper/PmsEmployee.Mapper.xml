@@ -298,14 +298,9 @@
 			   e.PHONENUMBER AS phoneNumber,
 			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS updateDate
 			FROM <include refid="pms_employee" /> e 
-			LEFT JOIN <include refid="pms_employee_role" /> inl
-			on inl.employeeId = e.employeeId
-			LEFT JOIN <include refid="pms_role" /> r
-			on r.roleId = inl.roleId
 			<where>
 				<![CDATA[
 					e.FLAG = 1
-					AND r.roleName = '销售'
 					AND DIMISSIONSTATUS <> 1
 				]]>
 				<include refid="condition" />
@@ -421,7 +416,8 @@
 	<select id="listBy" resultType="PmsEmployee">
 		SELECT e.EMPLOYEEID AS employeeId,
 			   e.EMPLOYEELOGINNAME AS employeeLoginName,
-			   e.EMPLOYEEREALNAME AS employeeRealName
+			   e.EMPLOYEEREALNAME AS employeeRealName,
+			   e.DIMISSIONSTATUS AS dimissionStatus
 		FROM <include refid="pms_employee" /> e 
 		<where>
 			<include refid="condition" />

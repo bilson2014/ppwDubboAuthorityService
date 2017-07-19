@@ -183,4 +183,10 @@ public class PmsEmployeeServiceImpl implements PmsEmployeeFacade {
 		return pmsEmployeeBiz.findEmployeeByRoleIds(param);
 	}
 
+	@Override
+	public List<PmsEmployee> findEmployeeByCondition(Map<String, Object> paramMap) {
+		
+		return pmsEmployeeBiz.findEmployeeByCondition(paramMap);
+	}
+
 }
