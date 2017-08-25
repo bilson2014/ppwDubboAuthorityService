@@ -15,7 +15,7 @@
 		<if test="phoneNumber != null and phoneNumber != ''">
 			AND PHONENUMBER = #{phoneNumber}
 		</if>
-		<if test="employeeIds != null and employeeIds != ''">
+		<if test="employeeIds != null">
 			AND EMPLOYEEID IN 
 			<foreach collection="employeeIds" item="employeeId" separator=","
 				open="(" close=")">

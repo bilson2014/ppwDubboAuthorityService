@@ -108,6 +108,7 @@ public class PmsRightBiz {
 		if (ValidateUtil.isValid(pList)) {
 			final Map<String, Object> param = new HashMap<String, Object>();
 			param.put("pList", pList);
+			param.put("resourceType", null);
 			return pmsRightDao.listBy(param);
 		}
 		return null;
@@ -116,11 +117,13 @@ public class PmsRightBiz {
 	public List<PmsRight> getRightsByMenu() {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("resourceType", 0);
+		param.put("pList", null);
 		return pmsRightDao.listBy(param);
 	}
 
 	public List<Long> findRightsByRole(long roleId) {
-		return pmsRightDao.findRightsByRole(roleId);
+		List<Long> roles = pmsRightDao.findRightsByRole(roleId);
+		return roles;
 	}
 
 }

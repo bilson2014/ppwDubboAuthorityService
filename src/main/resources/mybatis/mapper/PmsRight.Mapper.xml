@@ -9,8 +9,8 @@
 	<!-- 条件设置 -->
 	<sql id="condition_sql">
 		<!-- Equal query -->
-		<if test="resourceType != null"> AND RESOURCETYPE = ${resourceType} </if>
-		<if test="pList != null and pList !=''"> AND RIGHTID IN 
+		<if test="resourceType != null"> AND RESOURCETYPE = #{resourceType} </if>
+		<if test="pList != null"> AND RIGHTID IN 
 			<foreach collection="pList" open="(" close=")" item="pId" separator=",">
 				${pId}
 			</foreach>
