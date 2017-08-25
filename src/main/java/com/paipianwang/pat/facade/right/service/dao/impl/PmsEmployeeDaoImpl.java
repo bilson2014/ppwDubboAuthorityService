@@ -34,6 +34,9 @@ public class PmsEmployeeDaoImpl extends BaseDaoImpl<PmsEmployee> implements PmsE
 	public static final String SQL_FIND_EMPLOYEE_BY_IDS = "findEmployeeByIds";
 	public static final String SQL_FIND_EMPLOYEES_BY_PHONENUMBER = "findEmployeesByPhoneNumber";
 	public static final String SQL_UPDATE_UNIQUEID = "updateUniqueId";
+	public static final String SQL_UPDATE_SELF="updateSelf";
+	public static final String SQL_UPDATE_PHONE_BY_ID = "updatePhoneById";
+	public static final String SQL_UPDATE_EMAIL_BY_ID = "updateEmailById";
 	
 
 	@Override
@@ -109,6 +112,21 @@ public class PmsEmployeeDaoImpl extends BaseDaoImpl<PmsEmployee> implements PmsE
 	@Override
 	public long updateUniqueId(PmsEmployee employee) {
 		return sessionTemplate.update(getStatement(SQL_UPDATE_UNIQUEID), employee);
+	}
+
+	@Override
+	public long updateSelf(PmsEmployee employee) {
+		return sessionTemplate.update(getStatement(SQL_UPDATE_SELF), employee);
+	}
+
+	@Override
+	public long updatePhoneById(PmsEmployee employee) {
+		return sessionTemplate.update(getStatement(SQL_UPDATE_PHONE_BY_ID), employee);
+	}
+
+	@Override
+	public long updateEmailById(PmsEmployee employee) {
+		return sessionTemplate.update(getStatement(SQL_UPDATE_EMAIL_BY_ID), employee);
 	}
 
 }

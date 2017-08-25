@@ -104,4 +104,15 @@ public interface PmsEmployeeDao extends BaseDao<PmsEmployee> {
 	 */
 	public long updateUniqueId(PmsEmployee employee);
 
+	/**
+	 * 员工个人信息修改
+	 * @param employee
+	 * @return
+	 */
+	public long updateSelf(PmsEmployee employee);
+
+	public long updatePhoneById(PmsEmployee employee);
+
+	public long updateEmailById(PmsEmployee employee);
+
 }

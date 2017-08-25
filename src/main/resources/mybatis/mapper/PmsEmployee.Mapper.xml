@@ -81,6 +81,7 @@
 			   e.EMPLOYEEDESCRIPTION,
 			   e.EMPLOYEEIMG,
 			   e.PHONENUMBER,
+			   e.EMAIL,
 			   DATE_FORMAT(e.UPDATEDATE,'%Y-%m-%d %T') AS updateDate,
 			   r.ROLEID,
 			   r.ROLENAME,
@@ -427,5 +428,52 @@
 			ORDER BY e.EMPLOYEEID DESC
 		]]>
 	</select>
+	
+	<update id="updateSelf">
+		UPDATE 
+		<include refid="pms_employee" />
+		<set>
+			<if test="employeeImg != null and employeeImg != ''">
+				EMPLOYEEIMG = #{employeeImg},
+			</if>
+			<if test="employeePassword != null and employeePassword != ''">
+				EMPLOYEEPASSWORD = #{employeePassword},
+			</if>
+			<if test="phoneNumber != null and phoneNumber != ''">
+				PHONENUMBER = #{phoneNumber},
+			</if>
+			<if test="email != null and email != ''">
+				EMAIL = #{email},
+			</if>
+			UPDATEDATE = CURRENT_TIMESTAMP	
+		</set>
+		<where>
+			EMPLOYEEID = ${employeeId}
+		</where>
+	</update>
+	
+	<update id="updatePhoneById">
+		UPDATE 
+		<include refid="pms_employee" /> 
+		<set>
+			PHONENUMBER = #{phoneNumber},
+			UPDATEDATE = CURRENT_TIMESTAMP
+		</set> 
+		<where>
+			EMPLOYEEID = ${employeeId}
+		</where>
+	</update>
+	
+	<update id="updateEmailById">
+		UPDATE 
+		<include refid="pms_employee" /> 
+		<set>
+			EMAIL = #{email},
+			UPDATEDATE = CURRENT_TIMESTAMP
+		</set> 
+		<where>
+			EMPLOYEEID = ${employeeId}
+		</where>
+	</update>
 	
 </mapper>
