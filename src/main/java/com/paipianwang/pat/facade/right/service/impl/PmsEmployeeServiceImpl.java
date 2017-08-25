@@ -189,4 +189,28 @@ public class PmsEmployeeServiceImpl implements PmsEmployeeFacade {
 		return pmsEmployeeBiz.findEmployeeByCondition(paramMap);
 	}
 
+	/**
+	 * 员工个人信息修改
+	 */
+	@Override
+	public long updateSelf(PmsEmployee employee) {
+		return pmsEmployeeBiz.updateSelf(employee);
+	}
+
+	/**
+	 * 修改员工手机号
+	 */
+	@Override
+	public long updatePhoneById(PmsEmployee employee) {
+		return pmsEmployeeBiz.updatePhoneById(employee);
+	}
+
+	/**
+	 * 修改员工邮箱
+	 */
+	@Override
+	public long updateEmailById(PmsEmployee employee) {
+		return pmsEmployeeBiz.updateEmailById(employee);
+	}
+
 }
