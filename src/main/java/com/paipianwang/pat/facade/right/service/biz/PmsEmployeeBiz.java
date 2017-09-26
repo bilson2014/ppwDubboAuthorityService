@@ -78,9 +78,9 @@ public class PmsEmployeeBiz {
 
 	@Transactional
 	public long save(final PmsEmployee employee) {
-		long ret = pmsEmployeeDao.insert(employee);
+		pmsEmployeeDao.insert(employee);
 		pmsEmployeeDao.saveRelativity(employee);
-		return ret;
+		return employee.getEmployeeId();
 	}
 
 	@Transactional
